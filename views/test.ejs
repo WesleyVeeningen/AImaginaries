@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallerij</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://kit.fontawesome.com/f8991e1757.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body class="w-full h-full justify-center bg-stone-800">
+
+    <div id="canvas"></div> <!-- Container for the 3D scene -->
+
+    <script>
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer();
+
+
+
+        // Set the size of the renderer and add it to the page
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas').appendChild(renderer.domElement);
+
+        // Load the images as textures
+        var textureLoader = new THREE.TextureLoader();
+        var textures = [
+            textureLoader.load('/images/foto1.jpg'),
+            textureLoader.load('/images/foto2.jpeg'),
+            textureLoader.load('/images/foto3.jpg'),
+            textureLoader.load('/images/foto4.jpg'),
+            // Add more textures as needed
+        ];
+
+        // Create planes and map the textures onto them
+        var planes = textures.map(function (texture) {
+            var geometry = new THREE.PlaneGeometry(1, 1);
+            var material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+            return new THREE.Mesh(geometry, material);
+        });
+
+        // Position the planes in pairs and add them to the scene
+        for (var i = 0; i < planes.length; i += 2) {
+            planes[i].position.set(-1, 0, -i);
+            planes[i].rotation.y = Math.PI / 6; // Tilt the plane
+            if (planes[i + 1]) {
+                planes[i + 1].position.set(1, 0, -i);
+                planes[i + 1].rotation.y = -Math.PI / 6; // Tilt the plane in the opposite direction
+                scene.add(planes[i + 1]);
+            }
+            scene.add(planes[i]);
+        }
+
+        // Create an animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Move the planes towards the viewer
+            for (var i = 0; i < planes.length; i++) {
+                planes[i].position.z += 0.05;
+            }
+
+            // If a plane has reached the viewer, move it back and load the next image
+            for (var i = 0; i < planes.length; i++) {
+                if (planes[i].position.z > 0.1) {
+                    planes[i].position.z = -5; // Move the plane back to a fixed distance
+                    planes[i].material.map = textures[(i + 2) % textures.length];
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+
+
+    </script>
+
+</body>
+
+</html>
+
+</html>

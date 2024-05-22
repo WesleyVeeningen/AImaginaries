@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workshop</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://kit.fontawesome.com/f8991e1757.js" crossorigin="anonymous"></script>
+    <style>
+        #nav {
+            background-color: rgb(255, 255, 255);
+        }
+
+        .serviceLogo {
+            margin-right: 10px;
+            border-radius: 500px;
+            border: 0.5px #00000045 solid;
+        }
+    </style>
+</head>
+
+<body
+    style="background-image: url(https://i.ibb.co/HKPXjWz/foto-aimagineries-pagina-transformed.jpg); background-size: cover; backdrop-filter: brightness(85%) blur(50px);"
+    class="bg-gradient-to-br from-violet-500 to-pink-300 h-screen overflow-hidden">
+
+    <% include ../components/navbar.ejs %>
+
+        <main class="flex flex-col h-full justify-center outline-none back">
+            <div style="max-width: 800px;" class="container mx-auto bg-white rounded-2xl p-5 shadow-2xl">
+                <div id="text-container">
+                    <p class="text-2xl font-bold text-left text-purple-700 mb-3">Welcome to the AImaginaries workshop
+                    </p>
+                    <p id="text-content">Together we explore and reflect on the world we want to live in in the future.
+                        We will do this by creating equitable visions of the future using various generative AI
+                        tools.<br><br>Lets get started!</p>
+                </div>
+                <button id="nextBtn" onclick="nextDialog()"
+                    class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mt-5">Next</button>
+            </div>
+        </main>
+
+        <script>
+            const titles = ["Welcome to the AImaginaries workshop", "Opstarten van de programma's", "Specialized Workshop", "Community Workshop", "Papiertje", "Thank you for participating!"];
+
+            const texts = [
+                " ",
+                "Open één van de programma's die je wilt gebruiken. Je kunt kiezen uit verschillende chat AIs zoals ChatGPT, Bing AI of Gemini <br><br><a href='https://chat.openai.com/chat' target='_blank'><img class='serviceLogo' src='https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg' width='40' style='display: inline-block;'></a><a href='https://www.bing.com/chat' target='_blank'><img style='display: inline-block;' class='serviceLogo' src='https://i.ibb.co/41CryV9/bing.png' width='40'></a><a href='https://gemini.google.com/app' target='_blank'><img style='display: inline-block;' class='serviceLogo' src='https://i.ibb.co/845Bk29/unnamed.png' width='40'></a>", "Specialized workshops offer focused training on specific topics. These workshops are designed for those who want to gain expertise in a particular area.",
+                "Our community workshops allow you to network with like-minded individuals and share knowledge. Participate in community workshops to expand your horizons.",
+                "Enter ur bad opinion here.<br> <textarea class='border-2 p-2 focus:outline-none rounded-md' rows='4' cols='50'></textarea>",
+                "Thank you for participating in the workshop. We hope you enjoyed the experience and learned something new. If you have any feedback or suggestions, please feel free to share them with us."
+            ];
+
+            let currentIndex = 0;
+
+            function nextDialog() {
+                if (currentIndex < texts.length - 1) {
+                    currentIndex++;
+                    document.getElementById('text-container').getElementsByTagName('p')[0].innerHTML = titles[currentIndex];
+                    document.getElementById('text-content').innerHTML = texts[currentIndex];
+                }
+                if (currentIndex === texts.length - 1) {
+                    document.getElementById('nextBtn').style.display = 'none';
+                }
+            }
+        </script>
+</body>
+
+</html>

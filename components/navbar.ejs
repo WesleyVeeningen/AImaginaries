@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://kit.fontawesome.com/f8991e1757.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-text {
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div id="nav"
+            class="w-full py-5 bg-transparent drop-shadow-md fixed font-bold text-2xl flex justify-between px-4">
+            <div id="navbrand" class="absolute">
+                <h1 class="gradient-text ">AImaginaries</h1>
+            </div>
+            <div class="flex-grow flex justify-center hidden sm:flex">
+                <div id="navitems" class="space-x-4">
+                    <a href="/">Home</a>
+                    <a href="/galerij">Galerij</a>
+                    <a href="/workshop">Workshop</a>
+                </div>
+            </div>
+            <div id="navlogin" class="hidden sm:flex">
+                <i class="fa-solid fa-user"></i>
+            </div>
+        </div>
+        <button onclick="ShowDropdown()" id="bars" class="absolute top-3 sm:hidden right-3">
+            <i class="fa-solid text-4xl fa-bars"></i>
+        </button>
+        <div id="dropdown" class="hidden flex flex-col items-center justify-center absolute w-full h-screen bg-white">
+            <button onclick="ShowDropdown()" id="bars" class="absolute top-3 sm:hidden right-3">
+                <i class="fa-solid text-4xl fa-x"></i>
+            </button>
+            <a href="/">Home</a>
+            <a href="/galerij">Galerij</a>
+            <a href="/workshop">Workshop</a>
+        </div>
+    </nav>
+
+    <script>
+        function ShowDropdown() {
+            let dropdown = document.getElementById('dropdown');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
