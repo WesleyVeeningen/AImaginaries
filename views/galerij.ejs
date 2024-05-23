@@ -4,86 +4,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallerij</title>
+    <title>Galerij</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
     <script src="https://kit.fontawesome.com/f8991e1757.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/PointerLockControls.js"></script>
+    <style>
+        #info {
+            position: absolute;
+            color: white;
+            font-size: 24px;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body class="w-full h-full justify-center">
 
-    <div id="canvas" style="background-color: aqua; background-size: cover; background-position: center;">
-    </div>
-    <!-- Container for the 3D scene -->
-
     <script>
-        // Create a scene, camera, and renderer
-        var scene = new THREE.Scene();
+        // Preload images
+        var preloadImages = [
+            '/images/foto1.jpg',
+            '/images/foto2.jpeg',
+            '/images/foto3.jpg',
+            '/images/foto4.jpg',
+            '/images/foto3.jpg',
+            '/images/foto4.jpg',
+            '/images/foto3.jpg',
+            '/images/foto4.jpg',
 
-        // Load the background image
-        var textureLoader = new THREE.TextureLoader();
-        var backgroundImage = textureLoader.load('/images/background.jpg'); // Change path to your image
-
-        // Set the background of the scene as the loaded image
-        scene.background = backgroundImage;
-
-        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        var renderer = new THREE.WebGLRenderer();
-
-        // Set the size of the renderer and add it to the page
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas').appendChild(renderer.domElement);
-
-        // Load the images as textures
-        var textures = [
-            textureLoader.load('/images/foto1.jpg'),
-            textureLoader.load('/images/foto2.jpeg'),
-            textureLoader.load('/images/foto3.jpg'),
-            textureLoader.load('/images/foto4.jpg'),
-            // Add more textures as needed
+            // Add more image paths as needed
         ];
 
-        // Create planes and map the textures onto them
-        var planes = textures.map(function (texture) {
-            var geometry = new THREE.PlaneGeometry(1, 1);
-            var material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-            return new THREE.Mesh(geometry, material);
+        var loadedImages = 0;
+        var textures = [];
+
+        preloadImages.forEach(function (src) {
+            var textureLoader = new THREE.TextureLoader();
+            textureLoader.load(src, function (texture) {
+                textures.push(texture);
+                loadedImages++;
+                if (loadedImages === preloadImages.length) {
+                    initializeScene();
+                }
+            });
         });
 
-        // Position the planes in pairs and add them to the scene
-        for (var i = 0; i < planes.length; i += 2) {
-            planes[i].position.set(-1, 0, -i);
-            planes[i].rotation.y = Math.PI / 6; // Tilt the plane
-            if (planes[i + 1]) {
-                planes[i + 1].position.set(1, 0, -i);
-                planes[i + 1].rotation.y = -Math.PI / 6; // Tilt the plane in the opposite direction
-                scene.add(planes[i + 1]);
-            }
-            scene.add(planes[i]);
-        }
 
-        // Create an animation loop
-        function animate() {
-            requestAnimationFrame(animate);
 
-            // Move the planes towards the viewer
-            for (var i = 0; i < planes.length; i++) {
-                planes[i].position.z += 0.02;
-            }
 
-            // If a plane has reached the viewer, move it back and load the next image
-            for (var i = 0; i < planes.length; i++) {
-                if (planes[i].position.z > 1) {
-                    planes[i].position.z = -5; // Move the plane back to a fixed distance
-                    planes[i].material.map = textures[(i + 2) % textures.length];
+        function initializeScene() {
+            // Create a scene, camera, and renderer
+            var scene = new THREE.Scene();
+
+            // Create a camera and renderer
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5; // Position the camera further back
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas').appendChild(renderer.domElement);
+
+            // Use the preloaded textures
+            var imageTexts = [
+                "This is the first image.",
+                "This is the second image.",
+                "This is the third image.",
+                "This is the fourth image.",
+                "This is the first image.",
+                "This is the second image.",
+                "This is the third image.",
+                "This is the fourth image.",
+                // Add more texts as needed
+            ];
+
+            // Create planes and map the preloaded textures onto them
+            var planes = textures.map(function (texture) {
+                var geometry = new THREE.PlaneGeometry(2, 2); // Increase the size of the planes
+                var material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+                return new THREE.Mesh(geometry, material);
+            });
+
+            var skyboxLoader = new THREE.CubeTextureLoader();
+            var skyboxTexture = skyboxLoader.load([
+                '/images/background.jpg',
+                '/images/background.jpg',
+                '/images/background.jpg',
+                '/images/background.jpg',
+                '/images/background.jpg',
+                '/images/background.jpg',
+            ]);
+
+            // Set the scene background to the skybox texture
+            scene.background = skyboxTexture;
+
+            // Position the planes in pairs and add them to the scene
+            var planeDistance = 4; // Increase the distance between pairs of planes
+            var initialOffset = 5; // Increase the initial offset from the camera
+
+            for (var i = 0; i < planes.length; i += 2) {
+                planes[i].position.set(-2, 0, -initialOffset - (i / 2) * planeDistance);
+                planes[i].rotation.y = Math.PI / 6; // Tilt the plane
+                scene.add(planes[i]);
+                if (planes[i + 1]) {
+                    planes[i + 1].position.set(2, 0, -initialOffset - (i / 2) * planeDistance);
+                    planes[i + 1].rotation.y = -Math.PI / 6; // Tilt the plane in the opposite direction
+                    scene.add(planes[i + 1]);
                 }
             }
 
-            renderer.render(scene, camera);
-        }
+            // Create the background plane
 
-        animate();
+            // PointerLockControls for mouse look
+            var controls = new THREE.PointerLockControls(camera, document.body);
+
+            // Event listeners for pointer lock
+            document.body.addEventListener('click', function () {
+                controls.lock();
+            }, false);
+
+            controls.addEventListener('lock', function () {
+                console.log('Pointer lock activated');
+            });
+
+            controls.addEventListener('unlock', function () {
+                console.log('Pointer lock deactivated');
+            });
+
+            scene.add(controls.getObject());
+
+            var moveForward = false;
+            var initialDirection = new THREE.Vector3(); // Vector to store the initial direction
+
+            // Store the initial forward direction of the camera
+            camera.getWorldDirection(initialDirection);
+            initialDirection.y = 0; // Keep movement in the horizontal plane
+            initialDirection.normalize();
+
+            // Event listeners for key controls
+            var onKeyDown = function (event) {
+                switch (event.code) {
+                    case 'KeyW':
+                        moveForward = true;
+                        break;
+                }
+            };
+
+            var onKeyUp = function (event) {
+                switch (event.code) {
+                    case 'KeyW':
+                        moveForward = false;
+                        break;
+                }
+            };
+
+            document.addEventListener('keydown', onKeyDown, false);
+            document.addEventListener('keyup', onKeyUp, false);
+
+            // Raycaster for detecting intersections
+            var raycaster = new THREE.Raycaster();
+            var info = document.getElementById('info');
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                if (moveForward) {
+                    // Move the camera along the initial direction vector
+                    camera.position.add(initialDirection.clone().multiplyScalar(0.1));
+
+                    // Move the planes forward and reset position if they go past the camera
+                    planes.forEach(function (plane) {
+                        if (plane.position.z > camera.position.z + initialOffset) {
+                            plane.position.z -= planes.length * planeDistance / 2;
+                        }
+                    });
+                }
+
+                // Update the raycaster to check for intersections
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                var intersects = raycaster.intersectObjects(planes);
+
+                if (intersects.length > 0) {
+                    var firstIntersect = intersects[0];
+                    var index = planes.indexOf(firstIntersect.object);
+                    info.textContent = imageTexts[index];
+                    info.style.display = 'block';
+
+                    // Convert 3D position to 2D screen space
+                    var vector = new THREE.Vector3();
+                    vector.setFromMatrixPosition(firstIntersect.object.matrixWorld);
+                    vector.project(camera);
+
+                    var widthHalf = window.innerWidth / 2;
+                    var heightHalf = window.innerHeight / 2;
+
+                    info.style.left = (vector.x * widthHalf + widthHalf) + 'px';
+                    info.style.top = (-vector.y * heightHalf + heightHalf - 20) + 'px'; // Adjust for height of text
+                } else {
+                    info.style.display = 'none';
+                }
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
     </script>
+
+    <div id="canvas" style="background-color: aqua; background-size: cover; background-position: center;"></div>
+    <div id="info"></div>
+    <!-- Container for the 3D scene -->
 
 </body>
 

@@ -21,4 +21,18 @@ router.get('/test', function (req, res, next) {
   res.render('test', { title: 'Galerij' });
 });
 
+router.get('/contact', function (req, res, next) {
+  res.render('contact', { title: 'Contact' });
+});
+
+router.get('/test2', function (req, res, next) {
+  res.render('test2', { title: 'Test2' });
+}
+);
+
+router.get('/galerijTest', function (req, res, next) {
+  res.render('galerijTest', { title: 'Test3' });
+}
+);
+
 module.exports = router;

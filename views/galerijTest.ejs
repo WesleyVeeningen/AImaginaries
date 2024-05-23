@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Hallway</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://kit.fontawesome.com/f8991e1757.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/PointerLockControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/MTLLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/OBJLoader.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #info {
+            position: absolute;
+            color: white;
+            font-size: 24px;
+            display: none;
+            pointer-events: none;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="canvas"></div>
+    <div id="info"></div>
+
+    <script>
+        // Scene setup
+        var scene = new THREE.Scene();
+
+        var images = [
+            '/images/foto1.jpg',
+            '/images/foto2.jpeg',
+            '/images/foto3.jpg',
+            '/images/foto2.jpeg',
+            '/images/foto2.jpeg',
+            '/images/foto3.jpg',
+            '/images/wall.png',
+
+            // Add more image paths as needed
+        ];
+
+        // Camera setup
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 2000);
+        camera.position.set(0, 5, 5);
+
+        // Renderer setup
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas').appendChild(renderer.domElement);
+
+        // Lights setup
+        var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(0, 10, 0);
+        scene.add(directionalLight);
+
+        // Create the hallway walls
+        var hallwaySegmentLength = 40;
+        var hallwayHeight = 15;
+        var hallwayWidth = 20;
+        var segments = [];
+
+        function createSegment(zPosition) {
+            var segment = new THREE.Object3D();
+
+            // Left wall
+            var leftWallTexture = new THREE.TextureLoader().load(images[0]);
+            var leftWallMaterial = new THREE.MeshBasicMaterial({ map: leftWallTexture, side: THREE.DoubleSide });
+            var leftWall = new THREE.Mesh(new THREE.PlaneGeometry(hallwaySegmentLength, hallwayHeight), leftWallMaterial);
+            leftWall.position.set(-hallwayWidth / 2, hallwayHeight / 2, zPosition);
+            leftWall.rotation.y = Math.PI / 2;
+            segment.add(leftWall);
+
+            // Right wall
+            var rightWallTexture = new THREE.TextureLoader().load(images[1]);
+            var rightWallMaterial = new THREE.MeshBasicMaterial({ map: rightWallTexture, side: THREE.DoubleSide });
+            var rightWall = new THREE.Mesh(new THREE.PlaneGeometry(hallwaySegmentLength, hallwayHeight), rightWallMaterial);
+            rightWall.position.set(hallwayWidth / 2, hallwayHeight / 2, zPosition);
+            rightWall.rotation.y = -Math.PI / 2;
+            segment.add(rightWall);
+
+            // Floor
+            var floorTexture = new THREE.TextureLoader().load(images[2]);
+            var floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture, side: THREE.DoubleSide });
+            var floor = new THREE.Mesh(new THREE.PlaneGeometry(hallwaySegmentLength, hallwayWidth), floorMaterial);
+            floor.position.set(0, 0, zPosition / 2);
+            floor.rotation.x = -Math.PI / 2;
+            segment.add(floor);
+
+            // Ceiling
+            var ceilingTexture = new THREE.TextureLoader().load(images[3]);
+            var ceilingMaterial = new THREE.MeshBasicMaterial({ map: ceilingTexture, side: THREE.DoubleSide });
+            var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(hallwaySegmentLength, hallwayWidth), ceilingMaterial);
+            ceiling.position.set(0, hallwayHeight, zPosition / 2);
+            ceiling.rotation.x = Math.PI / 2;
+            segment.add(ceiling);
+
+            segments.push(segment);
+            scene.add(segment);
+        }
+
+        // Create initial segments
+        for (var i = -200; i < 40; i++) {
+            createSegment(i * hallwaySegmentLength);
+        }
+
+        // PointerLockControls for mouse look
+        var controls = new THREE.PointerLockControls(camera, document.body);
+
+        // Event listeners for pointer lock
+        document.body.addEventListener('click', function () {
+            controls.lock();
+        }, false);
+
+        controls.addEventListener('lock', function () {
+            console.log('Pointer lock activated');
+        });
+
+        controls.addEventListener('unlock', function () {
+            console.log('Pointer lock deactivated');
+        });
+
+        scene.add(controls.getObject());
+
+        var moveForward = false;
+        var moveBackward = false;
+        var initialDirection = new THREE.Vector3();
+
+        // Store the initial forward direction of the camera
+        camera.getWorldDirection(initialDirection);
+        initialDirection.y = 0; // Keep movement in the horizontal plane
+        initialDirection.normalize();
+
+        // Event listeners for key controls
+        var onKeyDown = function (event) {
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = true;
+                    break;
+                case 'KeyS':
+                    moveBackward = true;
+                    break;
+            }
+        };
+
+        var onKeyUp = function (event) {
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = false;
+                    break;
+                case 'KeyS':
+                    moveBackward = false;
+                    break;
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown, false);
+        document.addEventListener('keyup', onKeyUp, false);
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (moveForward) {
+                camera.position.add(initialDirection.clone().multiplyScalar(0.1));
+                createSegment(segments.length * hallwaySegmentLength);
+            }
+            if (moveBackward) {
+                camera.position.sub(initialDirection.clone().multiplyScalar(0.1));
+                createSegment(segments.length * hallwaySegmentLength);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

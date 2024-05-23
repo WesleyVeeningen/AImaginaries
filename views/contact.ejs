@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contactpagina</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" />
+    <script src="https://kit.fontawesome.com/f8991e1757.js" crossorigin="anonymous"></script>
+    <style>
+        #nav {
+            background-color: rgb(255, 255, 255);
+        }
+
+        .serviceLogo {
+            margin-right: 10px;
+            border-radius: 500px;
+            border: 0.5px #7c7c7c45 solid;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <% include ../components/navbar.ejs %>
+        <div class="container mx-auto p-8 flex justify-center">
+            <div class="mt-32 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-8 shadow-lg">
+                <h2 class="mb-6 text-center text-2xl font-bold">Contact</h2>
+                <form id="contactForm" action="/submit" method="post">
+                    <div class="mb-4">
+                        <label for="name" class="mb-2 block font-bold text-gray-700">Naam</label>
+                        <input type="text" id="name" name="name" placeholder="Voor en achternaam"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="mb-2 block font-bold text-gray-700">Email-adres</label>
+                        <input type="email" id="email" name="email" placeholder="Email-adres"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="phone" class="mb-2 block font-bold text-gray-700">Telefoonnummer</label>
+                        <input type="tel" id="phone" name="phone" placeholder="Telefoonnummer"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2" maxlength="9" pattern="\d{9}" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="message" class="mb-2 block font-bold text-gray-700">Bericht</label>
+                        <textarea id="message" name="message" placeholder="Uw bericht" rows="5"
+                            class="w-full rounded-md border border-blue-300 px-3 py-2" required></textarea>
+                    </div>
+                    <div>
+                        <button type="submit"
+                            class="rounded-m w-full bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">Opsturen</button>
+                    </div>
+                    <div id="confirmation" class="mt-2 hidden text-sm text-green-500">Bedankt voor uw bericht!</div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('contactForm').addEventListener('submit', function (event) {
+                const form = event.target;
+                const name = form.name.value.trim();
+                const email = form.email.value.trim();
+                const phone = form.phone.value.trim();
+                const message = form.message.value.trim();
+                const phonePattern = /^\d{10}$/;
+
+                if (!name || !email || !message) {
+                    alert('Vul alsjeblieft alle verplichte velden in.');
+                    event.preventDefault();
+                    return;
+                }
+
+                if (!email.includes('@')) {
+                    alert('Voer een geldig email-adres in.');
+                    event.preventDefault();
+                    return;
+                }
+
+                if (phone && !phonePattern.test(phone)) {
+                    alert('Incorrect telefoonnumer.');
+                    event.preventDefault();
+                    return;
+                }
+
+                document.getElementById('confirmation').classList.remove('hidden');
+            });
+        </script>
+</body>
+
+</html>
