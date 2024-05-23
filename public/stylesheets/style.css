@@ -1368,6 +1368,10 @@ video {
   padding: 0.25rem;
 }
 
+.p-\[\FFFD\] {
+  padding: �;
+}
+
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;

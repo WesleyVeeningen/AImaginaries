@@ -56,7 +56,7 @@
 
         // Camera setup
         var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 2000);
-        camera.position.set(0, 5, 5);
+        camera.position.set(0, 7, 5, 5);
 
         // Renderer setup
         var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -76,6 +76,13 @@
         var hallwayHeight = 15;
         var hallwayWidth = 20;
         var segments = [];
+
+
+        var planes = textures.map(function (texture) {
+            var geometry = new THREE.PlaneGeometry(2, 2); // Increase the size of the planes
+            var material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+            return new THREE.Mesh(geometry, material);
+        });
 
         function createSegment(zPosition) {
             var segment = new THREE.Object3D();
